@@ -87,7 +87,7 @@ def test_hooks(device):
 
 
 @pytest.mark.parametrize('with_perf_model, N', [(x, y) for x in range(512, 4096, 512) for y in [False, True]])
-def test_prune_configs(with_perf_model: bool, device: str):
+def test_prune_configs(with_perf_model: bool, device: str, N: int):
     N = 1024
     src = torch.randn(N, device=device)
     dst = torch.empty(N, device=device)
