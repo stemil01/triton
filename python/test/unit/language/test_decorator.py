@@ -28,7 +28,7 @@ def test_decorator_with_def(device):
         pytest.fail(f"triton compile failed with error: {e}")
 
 
-@pytest.mark.parameterize("N", [1023, 2047])
+@pytest.mark.parametrize("N", [1023, 2047])
 def test_triton_heuristic(N, device):
     # N = 1023
     src = torch.empty(N, device=device)
