@@ -95,7 +95,7 @@ def test_prune_configs(with_perf_model: bool, device: str, N: int):
 
     def early_config_prune(configs, named_args, **kwargs):
         records['run_early_config_prune'] = True
-        if "N" in kwargs and kwargs["N"] == 1024:
+        if "N" in kwargs and kwargs["N"] == N:
             records['capture_kwargs'] = True
         if "dst" in named_args and "src" in named_args and len(named_args) == 2:
             records['capture_named_args'] = True
