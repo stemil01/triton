@@ -86,7 +86,7 @@ def test_hooks(device):
         assert values["has_exception"] is False
 
 
-@pytest.mark.parametrize('with_perf_model, N', [(x, y) for x in range(512, 4096, 512) for y in [False, True]])
+@pytest.mark.parametrize('with_perf_model, N', [(x, y) for x in [False, True] for y in range(512, 4096, 512)])
 def test_prune_configs(with_perf_model: bool, device: str, N: int):
     # N = 1024
     src = torch.randn(N, device=device)
