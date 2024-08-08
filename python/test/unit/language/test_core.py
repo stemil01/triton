@@ -638,7 +638,7 @@ def test_compare_op(dtype_x, dtype_y, op, mode_x, mode_y, num_ctas, device):
                                                 for dtype in dtypes_with_bfloat16
                                                 for M in range(16, 128, 16)
                                                 for N in range(16, 128, 16)
-                                                for seed in range(20, 3)])
+                                                for seed in [5, 7, 11 13, 17]])
 def test_broadcast(dtype, M, N, seed, device):
     check_type_supported(dtype, device)
 
