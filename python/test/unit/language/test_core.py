@@ -634,9 +634,13 @@ def test_compare_op(dtype_x, dtype_y, op, mode_x, mode_y, num_ctas, device):
 # test broadcast
 # ---------------
 @pytest.mark.interpreter
-@pytest.mark.parametrize("dtype", dtypes_with_bfloat16)
+@pytest.mark.parametrize("dtype, M, N, seed", [(dtype, M, N, seed)
+                                                for dtype in dtypes_with_bfloat16
+                                                for M in range(16, 128)
+                                                for N in range(16, 128)
+                                                for seed in range(20)])
 def test_broadcast(dtype, device):
-    check_type_supported(dtype, device)
+    check_type_supported(dtype, M, N, seed, device)
 
     @triton.jit
     def broadcast_kernel(x_ptr, y_ptr, y_broadcasted_ptr, M: tl.constexpr, N: tl.constexpr):
@@ -647,9 +651,10 @@ def test_broadcast(dtype, device):
         _, y_broadcasted = tl.broadcast(x, y)
         tl.store(y_broadcasted_ptr + N * offset1[:, None] + offset2[None, :], y_broadcasted)
 
-    M = 32
-    N = 64
-    rs = RandomState(17)
+    # M = 32
+    # N = 64
+    # rs = RandomState(17)
+    rs = RandomState(seed)
     x = numpy_random((M, N), dtype_str=dtype, rs=rs)
     y = numpy_random(N, dtype_str=dtype, rs=rs)
     _, y_broadcasted_np = np.broadcast_arrays(x, y)
