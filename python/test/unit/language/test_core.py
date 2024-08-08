@@ -639,8 +639,8 @@ def test_compare_op(dtype_x, dtype_y, op, mode_x, mode_y, num_ctas, device):
                                                 for M in range(16, 128)
                                                 for N in range(16, 128)
                                                 for seed in range(20)])
-def test_broadcast(dtype, device):
-    check_type_supported(dtype, M, N, seed, device)
+def test_broadcast(dtype, M, N, seed, device):
+    check_type_supported(dtype, device)
 
     @triton.jit
     def broadcast_kernel(x_ptr, y_ptr, y_broadcasted_ptr, M: tl.constexpr, N: tl.constexpr):
