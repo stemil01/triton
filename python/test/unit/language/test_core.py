@@ -666,6 +666,33 @@ def test_broadcast(dtype, M, N, seed, device):
     broadcast_kernel[(1, )](x_tri, y_tri, y_broadcasted_tri, M=M, N=N)
     assert (y_broadcasted_np == to_numpy(y_broadcasted_tri)).all()
 
+@pytest.mark.interpreter
+@pytest.mark.parametrize("dtype", dtypes_with_bfloat16)
+def test_broadcast_fewer_parameters(dtype, device):
+    check_type_supported(dtype, device)
+
+    @triton.jit
+    def broadcast_kernel(x_ptr, y_ptr, y_broadcasted_ptr, M: tl.constexpr, N: tl.constexpr):
+        offset1 = tl.arange(0, M)
+        offset2 = tl.arange(0, N)
+        x = tl.load(x_ptr + N * offset1[:, None] + offset2[None, :])
+        y = tl.load(y_ptr + offset2)
+        _, y_broadcasted = tl.broadcast(x, y)
+        tl.store(y_broadcasted_ptr + N * offset1[:, None] + offset2[None, :], y_broadcasted)
+
+    M = 32
+    N = 64
+    rs = RandomState(17)
+    x = numpy_random((M, N), dtype_str=dtype, rs=rs)
+    y = numpy_random(N, dtype_str=dtype, rs=rs)
+    _, y_broadcasted_np = np.broadcast_arrays(x, y)
+
+    x_tri = to_triton(x, device=device, dst_type=dtype)
+    y_tri = to_triton(y, device=device, dst_type=dtype)
+    y_broadcasted_tri = to_triton(np.empty((M, N), dtype=y_broadcasted_np.dtype), device=device, dst_type=dtype)
+
+    broadcast_kernel[(1, )](x_tri, y_tri, y_broadcasted_tri, M=M, N=N)
+    assert (y_broadcasted_np == to_numpy(y_broadcasted_tri)).all()
 
 # ----------
 # test slice
