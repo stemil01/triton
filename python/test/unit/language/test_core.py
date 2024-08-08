@@ -496,7 +496,8 @@ def test_addptr(dtype, order, device):
         else:
             tl.store(offs + y, tl.load(offs + x))
 
-    SIZE = 1024
+    # SIZE = 1024
+    SIZE = np.random.randint(128, 8192)
     rs = RandomState(17)
     x = numpy_random(SIZE, dtype_str=dtype, rs=rs)
     y = numpy_random(SIZE, dtype_str=dtype, rs=rs)
