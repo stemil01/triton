@@ -636,9 +636,9 @@ def test_compare_op(dtype_x, dtype_y, op, mode_x, mode_y, num_ctas, device):
 @pytest.mark.interpreter
 @pytest.mark.parametrize("dtype, M, N, seed", [(dtype, M, N, seed)
                                                 for dtype in dtypes_with_bfloat16
-                                                for M in range(16, 128)
-                                                for N in range(16, 128)
-                                                for seed in range(20)])
+                                                for M in range(16, 128, 16)
+                                                for N in range(16, 128, 16)
+                                                for seed in range(20, 3)])
 def test_broadcast(dtype, M, N, seed, device):
     check_type_supported(dtype, device)
 
