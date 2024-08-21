@@ -1540,7 +1540,8 @@ def test_tensor_atomic_rmw_block(num_ctas, device):
 @pytest.mark.interpreter
 @pytest.mark.parametrize("num_ctas", num_ctas_list)
 @pytest.mark.parametrize("shape", [(2 ** x, 2 ** x) for x in range(3, 10)])
-def test_tensor_atomic_rmw_block_EDITED(num_ctas, device, shape):
+@pytest.mark.parametrize("grid", [(1, ), (2, ), (4, ), (7, )])
+def test_tensor_atomic_rmw_block_EDITED(num_ctas, device, shape, grid):
     shape = (8, 8)
 
     @triton.jit
@@ -1553,7 +1554,7 @@ def test_tensor_atomic_rmw_block_EDITED(num_ctas, device, shape):
         tl.atomic_min(x, val)
 
     x = torch.ones((8, 8), device=device, dtype=torch.float32)
-    kernel[(2, )](x, shape[0], shape[1], num_ctas=num_ctas)
+    kernel[grid](x, shape[0], shape[1], num_ctas=num_ctas)
     assert torch.min(x).item() == 0.0
 
 
