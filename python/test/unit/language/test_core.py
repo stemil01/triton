@@ -1537,6 +1537,26 @@ def test_tensor_atomic_rmw_block(num_ctas, device):
     kernel[(2, )](x, shape[0], shape[1], num_ctas=num_ctas)
     assert torch.min(x).item() == 0.0
 
+@pytest.mark.interpreter
+@pytest.mark.parametrize("num_ctas", num_ctas_list)
+@pytest.mark.parametrize("shape", [(2 ** x, 2 ** x) for x in range(3, 10)])
+def test_tensor_atomic_rmw_block_EDITED(num_ctas, device, shape):
+    shape = (8, 8)
+
+    @triton.jit
+    def kernel(X, SHAPE0: tl.constexpr, SHAPE1: tl.constexpr):
+        off0 = tl.arange(0, SHAPE0)
+        off1 = tl.arange(0, SHAPE1)
+        offs = off0[:, None] * SHAPE1 + off1[None, :]
+        val = offs.to(tl.float32)
+        x = X + offs
+        tl.atomic_min(x, val)
+
+    x = torch.ones((8, 8), device=device, dtype=torch.float32)
+    kernel[(2, )](x, shape[0], shape[1], num_ctas=num_ctas)
+    assert torch.min(x).item() == 0.0
+
+
 
 @pytest.mark.interpreter
 @pytest.mark.parametrize("sem", [None, 'acquire', 'release', 'acq_rel', 'relaxed'])
